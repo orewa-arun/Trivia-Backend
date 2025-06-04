@@ -1,0 +1,5 @@
+secrets
+.venv
+.idea
+app/auth/email_whitelist.py
+.env
