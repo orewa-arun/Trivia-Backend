@@ -1,7 +1,7 @@
 from fastapi import Request, HTTPException, Depends
 from firebase_admin import auth as firebase_auth
 from app.db.dependencies import get_db
-from app.repository.auth_repository import is_email_allowed
+from app.auth.repository import is_email_allowed
 from app.utlis.logger import get_logger, log_with_method
 
 

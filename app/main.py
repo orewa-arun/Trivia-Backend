@@ -7,6 +7,7 @@ from app.auth.dependencies import verify_firebase_token
 from fastapi import FastAPI, Depends
 from app.auth.test_routes import router as test_router
 from fastapi.middleware.cors import CORSMiddleware
+from app.trivia.routes import router as trivia_router
 
 
 logging.basicConfig(
@@ -18,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 app = FastAPI(
-    title="JEE Mate AI",
+    title="THE GREAT INDIAN TRIVIA",
     version="1.0.0",
 )
 
@@ -35,6 +36,9 @@ app.add_middleware(
 app.include_router(
     test_router,
     dependencies=[Depends(verify_firebase_token)]
+)
+app.include_router(
+    trivia_router
 )
 
 
