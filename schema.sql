@@ -7,31 +7,20 @@ CREATE TABLE allowed_users (
 );
 
 
+DROP VIEW IF EXISTS leaderboard;
+DROP TABLE IF EXISTS user_answers;
+DROP TABLE IF EXISTS game_sessions;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS questions;
+DROP TABLE IF EXISTS ads;
+
+
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     uid TEXT UNIQUE, -- Firebase UID -> will be "guest" if users are not signed in
     email TEXT,
     name TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-
-CREATE TABLE questions (
-    id SERIAL PRIMARY KEY,
-    mcq_question TEXT,
-    mcq_options TEXT[], -- 4 options
-    mcq_correct_index INTEGER,
-    category TEXT,   -- 'history' or 'ad'
-    ad_id INTEGER,   -- NULL if not ad-based
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-
-CREATE TABLE ads (
-    id SERIAL PRIMARY KEY,
-    title TEXT,
-    content TEXT,
-    duration INTEGER  -- in seconds
 );
 
 
@@ -44,6 +33,19 @@ CREATE TABLE game_sessions (
 );
 
 
+CREATE TABLE questions (
+    id SERIAL PRIMARY KEY,
+    question TEXT,
+    options TEXT[], -- 4 options
+    correct_index INTEGER,
+    mul_correct_indices INTEGER[], -- for multiple correct answers
+    question_type TEXT,   -- 'MCQ' or 'MUL'
+    category TEXT,   -- 'history' or 'ad'
+    ad_id INTEGER,   -- NULL if not ad-based
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
 CREATE TABLE user_answers (
     id SERIAL PRIMARY KEY,
     session_id INTEGER REFERENCES game_sessions(id),
@@ -53,7 +55,15 @@ CREATE TABLE user_answers (
     answered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-DROP VIEW IF EXISTS leaderboard;
+
+CREATE TABLE ads (
+    id SERIAL PRIMARY KEY,
+    title TEXT,
+    content TEXT,
+    duration INTEGER  -- in seconds
+);
+
+
 CREATE OR REPLACE VIEW leaderboard AS
 SELECT 
     u.id AS user_id,

@@ -56,7 +56,7 @@ def fetch_next_unanswered_question(session_id: int, db):
     try:
         with db.cursor() as cur:
             cur.execute("""
-                SELECT q.id as id, q.mcq_question, q.mcq_options, COUNT(a.id) as answered
+                SELECT q.id as id, q.question, q.options, q.question_type, q.category, COUNT(a.id) as answered
                 FROM questions q
                 LEFT JOIN user_answers a ON q.id = a.question_id AND a.session_id = %s
                 WHERE q.category NOT IN ('ad')
@@ -73,7 +73,8 @@ def fetch_next_unanswered_question(session_id: int, db):
                 "id": question[0],
                 "question": question[1],
                 "options": question[2],
-                "index": question[0]
+                "question_type": question[3],
+                "category": question[4],
             }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
@@ -83,7 +84,7 @@ def fetch_next_unanswered_ad_question(session_id: int, db):
     try:
         with db.cursor() as cur:
             cur.execute("""
-                SELECT q.id, q.mcq_question, q.mcq_options, COUNT(a.id) as answered
+                SELECT q.id as id, q.question, q.options, q.question_type, q.category, COUNT(a.id) as answered
                 FROM questions q
                 LEFT JOIN user_answers a ON q.id = a.question_id AND a.session_id = %s
                 WHERE q.category IN ('ad')
@@ -93,18 +94,20 @@ def fetch_next_unanswered_ad_question(session_id: int, db):
                 LIMIT 1
             """, (session_id,))
             question = cur.fetchone()
-            log.debug(f"Fetched ad question: {question}")
+            log.debug(f"Fetched question: {question}")
             if not question:
                 raise HTTPException(status_code=404, detail="No more questions")
             return {
                 "id": question[0],
                 "question": question[1],
                 "options": question[2],
-                "index": question[0]
+                "question_type": question[3],
+                "category": question[4],
             }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
+    
+    
 '''
     The user can answer a question only once, 
     but there is no check preventing the user from answering the same question multiple times here,
@@ -113,9 +116,11 @@ def fetch_next_unanswered_ad_question(session_id: int, db):
 def store_answer_and_update_score(answer: MCQAnswerRequest, db):
     try:
         with db.cursor() as cur:
-            cur.execute("SELECT mcq_correct_index FROM questions WHERE id = %s", (answer.question_id,))
+            cur.execute("SELECT correct_index FROM questions WHERE id = %s", (answer.question_id,))
             correct = cur.fetchone()
             log.info("Correct answer fetched: %s", correct)
+            
+            # selected_index = -1 if no option is selected within the time limit
             is_correct = (correct[0] == answer.selected_index)
 
             cur.execute("""
@@ -137,6 +142,7 @@ def finalize_session(session_id: int, db):
             return {"status": "completed"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
 
 '''
     No check is made if the session is completed or not, must be handled from front-end
