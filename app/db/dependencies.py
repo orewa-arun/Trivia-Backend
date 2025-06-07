@@ -1,5 +1,6 @@
-import psycopg2
-import psycopg2.pool  # For connection pooling
+from multiprocessing import pool
+from psycopg2 import pool
+from urllib.parse import urlparse
 import os
 from dotenv import load_dotenv
 from contextlib import contextmanager
@@ -9,15 +10,13 @@ from fastapi import HTTPException
 load_dotenv()
 
 
-# Initialize connection pool (min 1, max 10 connections)
-connection_pool = psycopg2.pool.SimpleConnectionPool(
+# Construct the DSN (Data Source Name)
+dsn = os.getenv("DATABASE_URL")
+# Create the connection pool
+connection_pool = pool.SimpleConnectionPool(
     minconn=1,
     maxconn=10,
-    dbname=os.getenv("DB_NAME"),
-    user=os.getenv("DB_USER"),
-    password=os.getenv("DB_PASSWORD"),
-    host=os.getenv("DB_HOST"),
-    port=os.getenv("DB_PORT")
+    dsn=dsn
 )
 
 
