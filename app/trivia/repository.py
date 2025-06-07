@@ -158,3 +158,22 @@ def get_top_leaderboard_entries(db):
             return [{"user_id": r[0], "name": r[1], "score": r[2], "completed_at": str(r[3])} for r in result]
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+    
+
+def fetch_ad_content_by_id(ad_id: int, db):
+    try:
+        with db.cursor() as cur:
+            cur.execute("SELECT id, title, content, duration, image_url FROM ads WHERE id = %s", (ad_id,))
+            ad_content = cur.fetchone()
+            log.debug(f"Fetched ad content: {ad_content}")
+            if not ad_content:
+                raise HTTPException(status_code=404, detail="Ad not found")
+            return {
+                "id": ad_content[0],
+                "title": ad_content[1],
+                "content": ad_content[2],
+                "duration": ad_content[3],
+                "image_url": ad_content[4],
+            }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

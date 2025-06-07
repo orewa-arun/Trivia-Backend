@@ -20,6 +20,19 @@ def next_question(session_id: int, db=Depends(get_db)):
     return get_next_question(session_id, db)
 
 
+@router.post("/next/ad")
+def next_ad_question(session_id: int, db=Depends(get_db)):
+    return get_next_ad_question(session_id, db)
+
+
+@router.post("/ad")
+def get_ad(ad_id: int, db=Depends(get_db)):
+    ad_question = get_ad_content(ad_id, db)
+    if not ad_question:
+        raise HTTPException(status_code=404, detail=f"No ad available with id : {id}")
+    return ad_question
+
+
 @router.post("/answer")
 def submit_answer(answer: MCQAnswerRequest, db=Depends(get_db)):
     return handle_answer(answer, db)

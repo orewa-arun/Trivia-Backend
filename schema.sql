@@ -62,6 +62,7 @@ CREATE TABLE ads (
     content TEXT,
     duration INTEGER  -- in seconds
 );
+ALTER TABLE ads ADD COLUMN image_url TEXT;
 
 
 CREATE OR REPLACE VIEW leaderboard AS

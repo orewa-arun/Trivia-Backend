@@ -1,5 +1,5 @@
 from app.trivia.models import MCQAnswerRequest
-from app.trivia.repository import fetch_next_unanswered_ad_question, fetch_next_unanswered_question, finalize_session, get_or_create_guest_user_by_uid, get_top_leaderboard_entries, init_session, store_answer_and_update_score
+from app.trivia.repository import fetch_ad_content_by_id, fetch_next_unanswered_ad_question, fetch_next_unanswered_question, finalize_session, get_or_create_guest_user_by_uid, get_top_leaderboard_entries, init_session, store_answer_and_update_score
 from app.utlis.logger import get_logger
 
 
@@ -19,6 +19,10 @@ def get_next_question(session_id: int, db):
 
 def get_next_ad_question(session_id: int, db):
     return fetch_next_unanswered_ad_question(session_id, db)
+
+
+def get_ad_content(ad_id, db):
+    return fetch_ad_content_by_id(ad_id, db)
 
 
 def handle_answer(answer: MCQAnswerRequest, db):

@@ -77,9 +77,44 @@ VALUES
 
 
 -- Insert ad content
-INSERT INTO ads (title, content, duration)
+INSERT INTO ads (title, content, duration, image_url)
 VALUES (
   'Incredible India Tourism Campaign',
   'Incredible India is a campaign by the Government of India to promote tourism and highlight the cultural richness and historical diversity of India. It showcases destinations, heritage sites, and unique experiences like Ayurveda, Yoga, and rural tourism.',
-  15
+  15,
+  'https://media.licdn.com/dms/image/v2/C5112AQEwRrNfnxYFIQ/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1543158458612?e=1754524800&v=beta&t=BsUomF7OZOQbiFBjeW5tGO4jYMiynDeHIcV23inLImk'
 );
+
+-- Insert ad-based questions
+INSERT INTO questions (
+  question, options, correct_index, question_type, category, ad_id
+) VALUES (
+  'What is the main objective of the Incredible India campaign?',
+  ARRAY[
+    'To promote India’s sports industry',
+    'To promote tourism and showcase cultural richness',
+    'To encourage industrial development',
+    'To advertise Indian cuisine globally'
+  ],
+  1,
+  'MCQ',
+  'ad',
+  1
+);
+
+INSERT INTO questions (
+  question, options, correct_index, question_type, category, ad_id
+) VALUES (
+  'Which of the following are not the key highlights of the Incredible India campaign?',
+  ARRAY[
+    'Ayurveda and Yoga',
+    'Indian defense technology',
+    'UN affairs and diplomacy',
+    'Historical heritage sites'
+  ],
+  2,
+  'MCQ',
+  'ad',
+  1
+);
+
