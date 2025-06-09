@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import HTTPException
 from app.utlis.logger import get_logger
 from .models import MCQAnswerRequest
@@ -52,21 +53,34 @@ def init_session(user_id: int, db):
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-def fetch_next_unanswered_question(session_id: int, db):
+def fetch_next_unanswered_question(session_id: int, category: Optional[str], sub_category: Optional[str], db):
     try:
+        query = """
+            SELECT q.id as id, q.question, q.options, q.question_type, q.category, q.sub_category, COUNT(a.id) as answered
+            FROM questions q
+            LEFT JOIN user_answers a ON q.id = a.question_id AND a.session_id = %s
+            WHERE q.category NOT IN ('ad')
+        """
+        params: list[object] = [session_id]
+
+        # Optional filters
+        if category:
+            query += " AND q.category = %s"
+            params.append(category)
+        if sub_category:
+            query += " AND q.sub_category = %s"
+            params.append(sub_category)
+
+        query += """
+            GROUP BY q.id
+            HAVING COUNT(a.id) = 0
+            ORDER BY q.id ASC
+            LIMIT 1
+        """
+
         with db.cursor() as cur:
-            cur.execute("""
-                SELECT q.id as id, q.question, q.options, q.question_type, q.category, COUNT(a.id) as answered
-                FROM questions q
-                LEFT JOIN user_answers a ON q.id = a.question_id AND a.session_id = %s
-                WHERE q.category NOT IN ('ad')
-                GROUP BY q.id
-                HAVING COUNT(a.id) = 0
-                ORDER BY q.id ASC
-                LIMIT 1
-            """, (session_id,))
+            cur.execute(query, tuple(params))
             question = cur.fetchone()
-            log.debug(f"Fetched question: {question}")
             if not question:
                 raise HTTPException(status_code=404, detail="No more questions")
             return {
@@ -75,6 +89,7 @@ def fetch_next_unanswered_question(session_id: int, db):
                 "options": question[2],
                 "question_type": question[3],
                 "category": question[4],
+                "sub_category": question[5]
             }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")

@@ -24,3 +24,10 @@ class LeaderboardEntry(BaseModel):
     name: str
     score: int
     completed_at: Optional[str]
+    
+
+class NextQuestionRequest(BaseModel):
+    session_id: int
+    category: Optional[str]
+    sub_category: Optional[str]
+    

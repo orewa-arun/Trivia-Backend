@@ -40,7 +40,8 @@ CREATE TABLE questions (
     correct_index INTEGER,
     mul_correct_indices INTEGER[], -- for multiple correct answers
     question_type TEXT,   -- 'MCQ' or 'MUL'
-    category TEXT,   -- 'history' or 'ad'
+    category TEXT,   -- 'history' or 'ad' or 'IPL'
+    sub_category TEXT, -- 'RCB', 'MI', 'CSK'
     ad_id INTEGER,   -- NULL if not ad-based
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

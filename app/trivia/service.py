@@ -1,3 +1,4 @@
+from typing import Optional
 from app.trivia.models import MCQAnswerRequest
 from app.trivia.repository import fetch_ad_content_by_id, fetch_next_unanswered_ad_question, fetch_next_unanswered_question, finalize_session, get_or_create_guest_user_by_uid, get_top_leaderboard_entries, init_session, store_answer_and_update_score
 from app.utlis.logger import get_logger
@@ -13,8 +14,8 @@ def create_game_session(uid: str, db, guest_user_name: str = "Guest user"):
     return init_session(user["id"], db)
 
 
-def get_next_question(session_id: int, db):
-    return fetch_next_unanswered_question(session_id, db)
+def get_next_question(session_id: int, category: Optional[str], sub_category: Optional[str], db):
+    return fetch_next_unanswered_question(session_id, category, sub_category, db)
 
 
 def get_next_ad_question(session_id: int, db):

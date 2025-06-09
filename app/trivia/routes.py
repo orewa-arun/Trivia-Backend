@@ -16,8 +16,8 @@ def start_game(req: StartSessionRequest, db=Depends(get_db)):
 
 
 @router.post("/next")
-def next_question(session_id: int, db=Depends(get_db)):
-    return get_next_question(session_id, db)
+def next_question(req: NextQuestionRequest, db=Depends(get_db)):
+    return get_next_question(req.session_id, req.category, req.sub_category, db)
 
 
 @router.post("/next/ad")
